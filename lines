@@ -1,0 +1,6 @@
+public static string ReplaceIncorrectSeparators(string text)
+{
+    string[] words = text.Split(new char[] { ' ', ',', ':', '-', ';' }, StringSplitOptions.RemoveEmptyEntries);
+	var lines = string.Join("\t", words);
+	return lines;
+}
