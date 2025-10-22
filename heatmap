@@ -1,0 +1,49 @@
+namespace Names;
+
+internal static class HeatmapTask
+{
+    public static double[,] GetBirthsHeatMatrix(NameData[] names)
+    {
+        var heat = new double[30, 12];
+
+        foreach (var person in names)
+        {
+			var day = person.BirthDate.Day;
+
+			if (day == 1) 
+			{
+				continue;
+			}
+            
+            var dayIndex = day - 2;
+            var monthIndex = person.BirthDate.Month - 1;
+
+            if (dayIndex >= 0 && dayIndex < 30 && monthIndex >= 0 && monthIndex < 12)
+            {
+                heat[dayIndex, monthIndex]++;
+            }
+        }
+        return heat;
+    }
+
+    public static HeatmapData GetBirthsPerDateHeatmap(NameData[] names)
+    {
+        var heat = GetBirthsHeatMatrix(names);
+		var dayLabels = new string[30];
+
+        for (int i = 0; i < 30; i++)
+        {
+            dayLabels[i] = (i + 2).ToString();
+        }
+
+		var monthLabels = new[] 
+		{
+			"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"
+		};
+
+        return new HeatmapData(
+            "Карта рождаемости по датам",
+            heat,
+            dayLabels,
+            monthLabels);
+    }
