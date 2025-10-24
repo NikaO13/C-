@@ -1,0 +1,38 @@
+namespace Names;
+
+internal static class HistogramTask
+{
+	public static double[] GetBirthsPerDay(NameData[] names, string name)
+    {
+        var birthsPerDay = new double[31];
+        var nameLower = name.ToLower();
+
+        foreach (var person in names)
+        {
+            if (person.Name.ToLower() == nameLower)
+            {
+                var day = person.BirthDate.Day;
+                if (day >= 2 && day <= 31)
+                {
+                    birthsPerDay[day - 1]++;
+                }
+            }
+		}
+		return birthsPerDay;
+	}
+
+    public static HistogramData GetBirthsPerDayHistogram(NameData[] names, string name)
+	{
+		var birthsPerDay = GetBirthsPerDay(names, name);
+		var daysLabels = new string[31];
+
+        for (int i = 0; i < 31; i++)
+        {
+            daysLabels[i] = (i + 1).ToString();
+        }
+        return new HistogramData(
+            $"Рождаемость людей с именем '{name}'",
+            daysLabels,
+            birthsPerDay);
+    }
+}
