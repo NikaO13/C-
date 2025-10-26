@@ -1,0 +1,65 @@
+using NUnit.Framework;
+using NUnit.Framework.Legacy;
+
+namespace TableParser;
+
+[TestFixture]
+public class QuotedFieldTaskTests
+{
+    [TestCase("''", 0, "", 2)]
+    [TestCase("'a'", 0, "a", 3)]
+    public void Test(string line, int startIndex, string expectedValue, int expectedLength)
+    {
+        var actualToken = QuotedFieldTask.ReadQuotedField(line, startIndex);
+        ClassicAssert.AreEqual(new Token(expectedValue, startIndex, expectedLength), actualToken);
+    }
+}
+
+class QuotedFieldTask
+{
+    public static Token ReadQuotedField(string line, int startIndex)
+	{
+		var quoteChar = line[startIndex];
+		var (value, length) = ParseQuotedContent(line, startIndex, quoteChar);
+		return new Token(value, startIndex, length);
+	}
+
+	private static (string value, int length) ParseQuotedContent(string line, int startIndex, char quoteChar)
+	{
+		var tokenValue = "";
+		var length = 1;
+
+		for (int i = startIndex + 1; i < line.Length; i++)
+		{
+			if (line[i] == '\\')
+				(tokenValue, length, i) = HandleEscapeSequence(line, tokenValue, length, i);
+			else if (line[i] == quoteChar)
+				return (tokenValue, length + 1);
+			else
+				(tokenValue, length) = AddRegularChar(tokenValue, length, line[i]);
+		}
+
+		return (tokenValue, length);
+	}
+
+	private static (string value, int length, int newIndex) HandleEscapeSequence(
+    string line, string currentValue, int currentLength, int index)
+	{
+		if (index + 1 < line.Length)
+		{
+			currentValue += line[index + 1];
+			return (currentValue, currentLength + 2, index + 1);
+		}
+		else
+		{
+			currentValue += '\\';
+			return (currentValue, currentLength + 1, index);
+		}
+	}
+
+	private static (string value, int length) AddRegularChar(string currentValue, int currentLength, char ch)
+	{
+		currentValue += ch;
+		return (currentValue, currentLength + 1);
+	}
+}
