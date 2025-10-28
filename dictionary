@@ -1,0 +1,27 @@
+private static Dictionary<string, List<string>> OptimizeContacts(List<string> contacts)
+{
+    var dictionary = new Dictionary<string, List<string>>();
+    foreach (var contact in contacts)
+    {
+        var parts = contact.Split(':');
+        var name = parts[0];
+		var email = parts[1];
+
+        string key;
+		if (name.Length >= 2)
+		{
+			key = name.Substring(0, 2);
+		}
+		else
+		{
+			key = name;
+		}
+		if (!dictionary.ContainsKey(key))
+		{
+			dictionary[key] = new List<string>();
+		}
+        dictionary[key].Add(contact);
+    }
+
+    return dictionary;
+}
