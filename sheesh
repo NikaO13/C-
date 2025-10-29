@@ -1,0 +1,25 @@
+private static string ApplyCommands(string[] commands)
+{
+	StringBuilder result = new StringBuilder();
+  
+    foreach (string command in commands)
+    {
+        if (command.StartsWith("push "))
+        {
+            string textToAdd = command.Substring(5);
+            result.Append(textToAdd);
+        }
+        else if (command.StartsWith("pop "))
+        {
+            if (int.TryParse(command.Substring(4), out int charsToRemove))
+            {
+                if (charsToRemove > result.Length)
+                    charsToRemove = result.Length;
+                
+                result.Length -= charsToRemove;
+            }
+        }
+    }
+    
+    return result.ToString();
+}
