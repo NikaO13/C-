@@ -1,6 +1,6 @@
 namespace Mazes;
 
-public static class SnakeMazeTask
+public static class SnakeMazeTask111
 {
     public static void MoveOut(Robot robot, int width, int height)
     {
