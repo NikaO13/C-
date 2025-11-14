@@ -20,7 +20,7 @@ internal static class HistogramTask
 		}
 		return birthsPerDay;
 	}
-
+//today was the celebration bd of my girrls
     public static HistogramData GetBirthsPerDayHistogram(NameData[] names, string name)
 	{
 		var birthsPerDay = GetBirthsPerDay(names, name);
