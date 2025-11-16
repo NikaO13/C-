@@ -1,0 +1,22 @@
+namespace Pluralize;
+
+public static class PluralizeTask
+{
+	public static string PluralizeRubles(int count)
+	{
+        var lastDigit = count % 10;
+		var secondLastDigit = (count / 10) % 10;
+
+		if (secondLastDigit == 1 || lastDigit == 0 || lastDigit >= 5)
+		{
+			return "рублей";
+		}
+
+		if (lastDigit == 1)
+		{
+			return "рубль";
+		}
+
+		return "рубля";
+    }
+}
