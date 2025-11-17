@@ -1,0 +1,10 @@
+public static void WriteReversed(char[] items, int startIndex = 0)
+{
+	if (startIndex >= items.Length)
+        return;
+	
+    // Выводим в обратном порядке все элементы с индексом больше startIndex
+    WriteReversed(items, startIndex+1); 
+    // а потом выводим сам элемент startIndex
+    Console.Write(items[startIndex]); 
+}
