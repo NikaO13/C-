@@ -20,12 +20,9 @@ public static class DistanceTask
         else if (t > 1)
         {
             return Math.Sqrt((x - bx) * (x - bx) + (y - by) * (y - by));
-        }
-        else
-        {
-            var numerator = Math.Abs((bx - ax) * (y - ay) - (by - ay) * (x - ax));
-            var denominator = Math.Sqrt((bx - ax) * (bx - ax) + (by - ay) * (by - ay));
-            return numerator / denominator;
-        }   
+		}
+        var numerator = Math.Abs((bx - ax) * (y - ay) - (by - ay) * (x - ax));
+        var denominator = Math.Sqrt((bx - ax) * (bx - ax) + (by - ay) * (by - ay));
+        return numerator / denominator; 
     }
 }
