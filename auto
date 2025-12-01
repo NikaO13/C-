@@ -1,0 +1,88 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using NUnit.Framework;
+
+namespace Autocomplete;
+
+internal class AutocompleteTask
+{
+	public static string FindFirstByPrefix(IReadOnlyList<string> phrases, string prefix)
+	{
+		var index = LeftBorderTask.GetLeftBorderIndex(phrases, prefix, -1, phrases.Count) + 1;
+		if (index < phrases.Count && phrases[index].StartsWith(prefix, StringComparison.InvariantCultureIgnoreCase))
+			return phrases[index];
+            
+		return null;
+	}
+
+	public static string[] GetTopByPrefix(IReadOnlyList<string> phrases, string prefix, int count)
+	{
+		var left = LeftBorderTask.GetLeftBorderIndex(phrases, prefix, -1, phrases.Count) + 1;
+
+		if (left >= phrases.Count)
+		{
+            return new string[0];
+		}
+
+		var result = new List<string>();
+
+		for (var i = left; i < phrases.Count && result.Count < count; i++)
+        {
+            if (phrases[i].StartsWith(prefix, StringComparison.InvariantCultureIgnoreCase))
+			{
+				result.Add(phrases[i]);
+			}
+			else
+			{
+                break;
+            }
+        }
+        return result.ToArray();
+    }
+
+	public static int GetCountByPrefix(IReadOnlyList<string> phrases, string prefix)
+	{
+        var left = LeftBorderTask.GetLeftBorderIndex(phrases, prefix, -1, phrases.Count) + 1;
+        var right = RightBorderTask.GetRightBorderIndex(phrases, prefix, -1, phrases.Count);
+        return Math.Max(0, right - left);
+    }
+}
+
+[TestFixture]
+public class AutocompleteTests
+{
+	[Test]
+    public void TopByPrefix_ReturnsCorrectCount_WhenPhrasesExist()
+    {
+        var phrases = new List<string> { "apple", "application", "banana", "appetite" };
+        var result = AutocompleteTask.GetTopByPrefix(phrases, "app", 2);
+        Assert.That(result.Length, Is.EqualTo(2));
+        Assert.That(result[0], Is.EqualTo("apple"));
+        Assert.That(result[1], Is.EqualTo("application"));
+    }
+
+    [Test]
+    public void TopByPrefix_ReturnsEmpty_WhenNoMatches()
+    {
+        var phrases = new List<string> { "apple", "banana", "cherry" };
+        var result = AutocompleteTask.GetTopByPrefix(phrases, "xyz", 3);
+        Assert.That(result, Is.Empty);
+    }
+
+    [Test]
+    public void CountByPrefix_ReturnsZero_WhenNoMatches()
+    {
+        var phrases = new List<string> { "apple", "banana", "cherry" };
+        var result = AutocompleteTask.GetCountByPrefix(phrases, "xyz");
+        Assert.That(result, Is.EqualTo(0));
+    }
+
+    [Test]
+    public void CountByPrefix_ReturnsCorrectCount_WhenMatchesExist()
+    {
+        var phrases = new List<string> { "apple", "application", "banana", "appetite" };
+        var result = AutocompleteTask.GetCountByPrefix(phrases, "app");
+        Assert.That(result, Is.EqualTo(3));
+    }
+}
