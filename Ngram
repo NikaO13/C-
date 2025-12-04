@@ -1,0 +1,75 @@
+namespace TextAnalysis;
+
+static class FrequencyAnalysisTask
+{
+    public static Dictionary<string, string> GetMostFrequentNextWords(List<List<string>> text)
+    {
+        var result = new Dictionary<string, string>();
+        var bigramFreq = new Dictionary<string, Dictionary<string, int>>();
+        var trigramFreq = new Dictionary<string, Dictionary<string, int>>();
+
+        foreach (var sentence in text)
+        {
+            ExtractNGrams(sentence, bigramFreq, trigramFreq);
+        }
+
+        AddMostFrequentToResult(bigramFreq, result);
+        AddMostFrequentToResult(trigramFreq, result);
+
+        return result;
+    }
+
+    private static void ExtractNGrams(
+        List<string> sentence,
+        Dictionary<string, Dictionary<string, int>> bigramFreq,
+        Dictionary<string, Dictionary<string, int>> trigramFreq)
+    {
+        for (var i = 0; i < sentence.Count - 1; i++)
+        {
+            var bigramStart = sentence[i];
+            var bigramNext = sentence[i + 1];
+            AddNGram(bigramFreq, bigramStart, bigramNext);
+
+            if (i < sentence.Count - 2)
+            {
+                var trigramStart = $"{sentence[i]} {sentence[i + 1]}";
+                var trigramNext = sentence[i + 2];
+                AddNGram(trigramFreq, trigramStart, trigramNext);
+            }
+        }
+    }
+
+    private static void AddNGram(
+        Dictionary<string, Dictionary<string, int>> ngramFreq,
+        string start,
+        string next)
+    {
+        if (!ngramFreq.ContainsKey(start))
+        {
+            ngramFreq[start] = new Dictionary<string, int>();
+        }
+
+        if (!ngramFreq[start].ContainsKey(next))
+        {
+            ngramFreq[start][next] = 0;
+        }
+
+        ngramFreq[start][next]++;
+    }
+
+    private static void AddMostFrequentToResult(
+        Dictionary<string, Dictionary<string, int>> ngramFreq,
+        Dictionary<string, string> result)
+    {
+        foreach (var start in ngramFreq.Keys)
+        {
+            var maxFreq = ngramFreq[start].Values.Max();
+            var mostFrequent = ngramFreq[start]
+                .Where(pair => pair.Value == maxFreq)
+                .OrderBy(pair => pair.Key, StringComparer.Ordinal)
+                .First();
+
+            result[start] = mostFrequent.Key;
+        }
+    }
+}
