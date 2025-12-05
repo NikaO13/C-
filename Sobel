@@ -1,0 +1,43 @@
+using System;
+
+namespace Recognizer
+{
+    internal static class SobelFilterTask
+    {
+        public static double[,] SobelFilter(double[,] g, double[,] sx)
+		{
+			var width = g.GetLength(0);
+			var height = g.GetLength(1);
+			var result = new double[width, height];
+			var filterSize = sx.GetLength(0);
+			var offset = filterSize / 2;
+
+			for (var x = offset; x < width - offset; x++)
+			{
+				for (var y = offset; y < height - offset; y++)
+				{
+					CalculateGradients(g, sx, x, y, filterSize, offset, out double gx, out double gy);
+					result[x, y] = Math.Sqrt(gx * gx + gy * gy);
+				}
+			}
+			return result;
+		}
+
+		private static void CalculateGradients(double[,] g, double[,] sx, 
+			int x, int y, int filterSize, int offset, out double gx, out double gy)
+		{
+			gx = 0.0;
+			gy = 0.0;
+			for (var i = 0; i < filterSize; i++)
+			{
+				for (var j = 0; j < filterSize; j++)
+				{
+					var pixelX = x + i - offset;
+					var pixelY = y + j - offset;
+					gx += g[pixelX, pixelY] * sx[i, j];
+					gy += g[pixelX, pixelY] * sx[j, i];
+				}
+			}
+		}
+    }
+}
