@@ -6,12 +6,7 @@ public static class SnakeMazeTask
     {
         while (!robot.Finished)
         {
-            MoveZigZag(robot, width);
-            if (robot.Finished)
-            {
-                break;
-            }
-            MoveTo(robot, 2, Direction.Down);
+            MoveInSnakePattern(robot, width);
         }
     }
 
@@ -23,10 +18,16 @@ public static class SnakeMazeTask
         }
     }
 
-    private static void MoveZigZag(Robot robot, int width)
+    private static void MoveInSnakePattern(Robot robot, int width)
     {
         MoveTo(robot, width - 3, Direction.Right);
         MoveTo(robot, 2, Direction.Down);
         MoveTo(robot, width - 3, Direction.Left);
+
+		if (robot.Finished)
+        {
+            return;
+        }
+        MoveTo(robot, 2, Direction.Down);
     }
 }
