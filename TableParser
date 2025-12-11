@@ -1,0 +1,97 @@
+using NUnit.Framework;
+using NUnit.Framework.Legacy;
+
+namespace TableParser;
+
+[TestFixture]
+public class QuotedFieldTaskTests
+{
+    [TestCase("''", 0, "", 2)]
+    [TestCase("'a'", 0, "a", 3)]
+    public void Test(string line, int startIndex, string expectedValue, int expectedLength)
+    {
+        var actualToken = QuotedFieldTask.ReadQuotedField(line, startIndex);
+        ClassicAssert.AreEqual(new Token(expectedValue, startIndex, expectedLength), actualToken);
+    }
+}
+
+public class EscapeResult
+{
+    public string Value { get; set; } = "";
+    public int LengthIncrement { get; set; }
+    public int NewIndex { get; set; }
+}
+
+public class ParseResult
+{
+    public string Value { get; set; } = "";
+    public int Length { get; set; }
+}
+
+class QuotedFieldTask
+{
+    public static Token ReadQuotedField(string line, int startIndex)
+    {
+        var quoteChar = line[startIndex];
+        var parseResult = ParseQuotedContent(line, startIndex, quoteChar);
+        return new Token(parseResult.Value, startIndex, parseResult.Length);
+    }
+
+    private static ParseResult ParseQuotedContent(string line, int startIndex, char quoteChar)
+	{
+		var parseResult = new ParseResult();
+		parseResult.Value = "";
+		parseResult.Length = 1;
+
+		var i = startIndex + 1;
+		while (i < line.Length)
+		{
+			i = ProcessCharacter(line, i, quoteChar, parseResult);
+			if (i < 0) break;
+		}
+
+		return parseResult;
+	}
+
+	private static int ProcessCharacter(string line, int index, char quoteChar, ParseResult parseResult)
+	{
+		if (line[index] == '\\')
+		{
+			var escapeResult = HandleEscapeSequence(line, index);
+			parseResult.Value += escapeResult.Value;
+			parseResult.Length += escapeResult.LengthIncrement;
+			return escapeResult.NewIndex + 1;
+		}
+		else if (line[index] == quoteChar)
+		{
+			parseResult.Length++;
+			return -1;
+		}
+		else
+		{
+			parseResult.Value += line[index];
+			parseResult.Length++;
+			return index + 1;
+		}
+	}
+
+	private static EscapeResult HandleEscapeSequence(string line, int index)
+    {
+        var result = new EscapeResult();
+
+        if (index + 1 < line.Length)
+        {
+            result.Value = line[index + 1].ToString();
+            result.LengthIncrement = 2;
+            result.NewIndex = index + 1;
+        }
+        else
+        {
+            result.Value = "\\";
+            result.LengthIncrement = 1;
+            result.NewIndex = index;
+        }
+
+        return result;
+    }
+}
