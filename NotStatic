@@ -1,0 +1,87 @@
+using System;
+
+namespace Geometry
+{
+    public class Vector
+    {
+        public double X;
+        public double Y;
+
+        public double GetLength()
+        {
+            return Math.Sqrt(X * X + Y * Y);
+        }
+
+        public Vector Add(Vector other)
+        {
+            return new Vector { X = this.X + other.X, Y = this.Y + other.Y };
+        }
+
+        public bool Belongs(Segment segment)
+        {
+            return Geometry.IsVectorInSegment(this, segment);
+        }
+    }
+
+    public class Segment
+    {
+        public Vector Begin;
+        public Vector End;
+
+        public double GetLength()
+        {
+            var distanceX = End.X - Begin.X;
+            var distanceY = End.Y - Begin.Y;
+            return Math.Sqrt(distanceX * distanceX + distanceY * distanceY);
+        }
+
+        public bool Contains(Vector vector)
+        {
+            return Geometry.IsVectorInSegment(vector, this);
+        }
+    }
+
+    public class Geometry
+    {
+        public static double GetLength(Vector vector)
+        {
+            return vector.GetLength();
+        }
+
+        public static Vector Add(Vector vector1, Vector vector2)
+        {
+            return vector1.Add(vector2);
+        }
+
+        public static double GetLength(Segment segment)
+        {
+            return segment.GetLength();
+        }
+
+        public static bool IsVectorInSegment(Vector vector, Segment segment)
+        {
+            if (segment.Begin.X == segment.End.X && segment.Begin.Y == segment.End.Y)
+            {
+                return vector.X == segment.Begin.X && vector.Y == segment.Begin.Y;
+            }
+
+            var segmentDeltaX = segment.End.X - segment.Begin.X;
+            var segmentDeltaY = segment.End.Y - segment.Begin.Y;
+
+            var pointDeltaX = vector.X - segment.Begin.X;
+            var pointDeltaY = vector.Y - segment.Begin.Y;
+
+            var crossProduct = segmentDeltaX * pointDeltaY - segmentDeltaY * pointDeltaX;
+
+            if (Math.Abs(crossProduct) > 0)
+            {
+                return false;
+            }
+
+            var projectionSegment = segmentDeltaX * pointDeltaX + segmentDeltaY * pointDeltaY;
+            var squaredLengthAB = segmentDeltaX * segmentDeltaX + segmentDeltaY * segmentDeltaY;
+
+            return projectionSegment >= 0 && projectionSegment <= squaredLengthAB;
+        }
+    }
+}
