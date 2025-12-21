@@ -1,0 +1,42 @@
+namespace Mazes;
+
+public static class DiagonalMazeTask
+{
+	public static void MoveOut(Robot robot, int width, int height)
+	{
+		MoveInOptimalDirection(robot, width, height);
+		while (!robot.Finished)
+		{
+			MoveInOptimalDirection(robot, width, height);
+		}
+	}
+
+	private static void MoveInOptimalDirection(Robot robot, int width, int height)
+	{
+		if (width > height)
+		{
+			var stepsCount = (width - 2) / (height - 2);
+			MaxDiagonal(robot, stepsCount, Direction.Right, Direction.Down);
+		}
+		else
+		{
+			var stepsCount = (height - 2) / (width - 2);
+			MaxDiagonal(robot, stepsCount, Direction.Down, Direction.Right);
+		}
+	}
+
+	public static void MaxDiagonal(Robot robot, int stepsCount, Direction start, Direction finish)
+	{
+		Move(robot, stepsCount, start);
+		if (!robot.Finished)
+			Move(robot, 1, finish);
+	}
+  
+	public static void Move(Robot robot, int distance, Direction direction)
+    {
+		for (var i = 0; i < distance; i++)
+		{
+			robot.MoveTo(direction);
+		}
+    }
+}
