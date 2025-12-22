@@ -1,0 +1,11 @@
+public static double Calculate(string userInput)
+{
+    var numbers = userInput.Split();
+    var sum = double.Parse(numbers[0]);
+    var percentInput = double.Parse(numbers[1]);
+	var months = double.Parse(numbers[2]);
+	var percentInMonth = 1 + (percentInput / 12 / 100);
+	var percentOverall = Math.Pow(percentInMonth, months);
+    var final = sum * percentOverall;
+    return final;
+}
