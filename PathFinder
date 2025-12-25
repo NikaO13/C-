@@ -1,0 +1,103 @@
+using System;
+using System.Drawing;
+
+namespace RoutePlanning;
+
+public static class PathFinderTask
+{
+    private static Point[] checkpoints;
+    private static int[] bestOrder;
+    private static double bestLength = double.MaxValue;
+
+    public static int[] FindBestCheckpointsOrder(Point[] checkpoints)
+    {
+        if (checkpoints.Length == 0)
+        {
+            return new int[0];
+        }
+        if (checkpoints.Length == 1)
+        {
+            return new int[] { 0 };
+        }
+
+        PathFinderTask.checkpoints = checkpoints;
+        bestLength = double.MaxValue;
+
+        var startOrder = new int[checkpoints.Length];
+        for (var i = 0; i < startOrder.Length; i++)
+        {
+            startOrder[i] = i;
+        }
+
+        bestOrder = new int[startOrder.Length];
+        for (var i = 0; i < startOrder.Length; i++)
+        {
+            bestOrder[i] = startOrder[i];
+        }
+
+        bestLength = GetPathLength(startOrder);
+
+        var currentOrder = new int[checkpoints.Length];
+        currentOrder[0] = 0;
+        bool[] visited = new bool[checkpoints.Length];
+        visited[0] = true;
+
+        FindBestPath(currentOrder, visited, 1, 0.0);
+
+        return bestOrder;
+    }
+
+    private static void FindBestPath(int[] order, bool[] visited, int position, double currentLength)
+    {
+        if (currentLength >= bestLength)
+        {
+            return;
+        }
+
+        if (position == order.Length)
+        {
+            if (currentLength < bestLength)
+            {
+                bestLength = currentLength;
+                for (var i = 0; i < order.Length; i++)
+                {
+                    bestOrder[i] = order[i];
+                }
+            }
+            return;
+        }
+
+        for (var nextPoint = 1; nextPoint < checkpoints.Length; nextPoint++)
+        {
+            if (!visited[nextPoint])
+            {
+                visited[nextPoint] = true;
+                order[position] = nextPoint;
+
+                var segmentLength = GetDistance(checkpoints[order[position - 1]],
+                                                   checkpoints[nextPoint]);
+                FindBestPath(order, visited, position + 1, currentLength + segmentLength);
+
+                visited[nextPoint] = false;
+            }
+        }
+    }
+
+    private static double GetPathLength(int[] order)
+    {
+        var pathLength = 0.0;
+        for (var i = 0; i < order.Length - 1; i++)
+        {
+            pathLength += GetDistance(checkpoints[order[i]], checkpoints[order[i + 1]]);
+        }
+        return pathLength;
+    }
+
+    private static double GetDistance(Point firstCoordinate, Point secondCoordinate)
+    {
+        var distanceX = firstCoordinate.X - secondCoordinate.X;
+        var distanceY = firstCoordinate.Y - secondCoordinate.Y;
+        var totalDistance = Math.Sqrt(distanceX * distanceX + distanceY * distanceY);
+        return totalDistance;
+    }
+}
